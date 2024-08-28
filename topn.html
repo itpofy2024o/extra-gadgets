@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Top n Cryptocurrencies by Volume</title>
+  </head>
+  <body>
+    <h1>Top n Cryptocurrencies by Volume</h1>
+    <table>
+      <thead>
+        <tr>
+          <th style="background-color: blue;color:white;">Rank</th>
+          <th style="background-color: red;color:white;">Name</th>
+          <th style="background-color: blue;color:white;">Symbol</th>
+          <th style="background-color: red;color:white;">Price (USDT)</th>
+          <th style="background-color: blue;color:white;">Volume</th>
+          <th style="background-color: red;color:white;">Change (24h)</th>
+        </tr>
+      </thead>
+      <tbody id="crypto-table-body">
+      </tbody>
+    </table>
+
+    <script>
+      async function loadTopCryptoVolume() {
+        const response = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=total_volume_desc&per_page=50&page=1&sparkline=false');
+
+        if (response.ok) {
+          const cryptoData = await response.json();
+          const tableBody = document.getElementById('crypto-table-body');
+
+          cryptoData.forEach((crypto, index) => {
+            const row = document.createElement('tr');
+            const rankCell = document.createElement('td');
+            rankCell.innerText = index + 1;
+            row.appendChild(rankCell);
+
+            const nameCell = document.createElement('td');
+            nameCell.innerText = crypto.name;
+            row.appendChild(nameCell);
+
+            const symbolCell = document.createElement('td');
+            symbolCell.innerText = crypto.symbol.toUpperCase();
+            row.appendChild(symbolCell);
+
+            const priceCell = document.createElement('td');
+            priceCell.innerText = `$${crypto.current_price.toLocaleString()}`;
+            row.appendChild(priceCell);
+
+            const volumeCell = document.createElement('td');
+            volumeCell.innerText = `$${crypto.total_volume.toLocaleString()}`;
+            row.appendChild(volumeCell);
+
+            const changeCell = document.createElement('td');
+            const changePercent = crypto.price_change_percentage_24h;
+            changeCell.innerText = `${changePercent.toFixed(2)}%`;
+            if (changePercent < 0) {
+              changeCell.style.color = 'red';
+            } else if (changePercent > 0) {
+              changeCell.style.color = 'green';
+            }
+            row.appendChild(changeCell);
+
+            tableBody.appendChild(row);
+          });
+        } else {
+          console.log('Error loading data');
+        }
+      }
+
+      loadTopCryptoVolume();
+    </script>
+  </body>
+</html>
+
